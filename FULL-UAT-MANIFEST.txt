@@ -1,0 +1,8 @@
+NEXA GROUP FINANCE — FULL UAT GITHUB ADDITIONS
+.github/workflows/full-uat.yml
+tests/uat-fixture.php
+tests/full-uat.php
+tests/http-full-uat.sh
+tests/browser-uat.mjs
+tests/scale-uat.php
+UAT-GITHUB-UBUNTU.md
