@@ -30,6 +30,3 @@ Milestone: Dynamic Daily Income
 
 ## Production database
 Schema and migration are included. A real MySQL/MariaDB deployment must apply `database/migrations/20260925_v5_daily_income.sql` before enabling this feature on an upgraded R1 database.
-
-## GitHub Full UAT Gate Addendum
-A dedicated `.github/workflows/full-uat.yml` was added for Ubuntu GitHub Actions with independent gates for core regression, MySQL accounting, HTTP/security/reports, browser E2E/visual evidence, and multi-entity high-volume simulation. Final verdict is green only when all gates pass.

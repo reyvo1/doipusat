@@ -1,127 +1,116 @@
-# NEXA Group Finance — Production Final R2
+# NEXA Group Finance — Enterprise R3 Release Candidate
 
-Aplikasi pusat keuangan **multi-badan-usaha** berbasis **PHP + MySQL** untuk mengonsolidasikan hotel, retail/toko, kos/properti, F&B, jasa, dan unit usaha lain dalam satu group.
+NEXA Group Finance adalah pusat keuangan multi-badan-usaha berbasis **PHP + MySQL** untuk grup usaha seperti hotel, retail, kos/properti, F&B, jasa, dan unit bisnis lain. Production runtime tidak membutuhkan Node.js.
 
-## Modul utama
-- Executive Dashboard dengan grafik Canvas modern, responsive, light/dark mode.
-- Multi Company / Entity Management + laporan per entitas atau konsolidasi.
-- Double-Entry Journal & General Ledger.
-- Approval Center berdasarkan nominal.
-- Controlled Journal Reversal; jurnal sumber tidak dihapus.
-- Cash & Bank + rekening terdaftar dengan masking nomor rekening.
-- Bank CSV Import + Reconciliation.
-- AR / AP + aging + payment allocation ke ledger.
-- Fiscal Period Closing / hard lock.
-- Laporan Laba Rugi, Neraca, Arus Kas, Buku Besar, Neraca Saldo, Intercompany.
-- Export CSV/Excel-compatible + Print/Save PDF.
-- Budget & Forecast.
-- Fixed Assets + straight-line book value.
-- Intercompany Matching + Consolidation Elimination.
-- Tax Profiles + kalkulator inclusive/exclusive.
-- Multi-Currency + realized FX gain/loss.
-- Integration Staging API dengan integration key + idempotency.
-- Backup logical snapshot + SHA-256 verification + owner-only restore pada Demo Mode.
-- Audit Trail.
-- RBAC + company data scope.
-- Health endpoint untuk deployment monitoring.
+## Status
 
-## Runtime
-Server produksi **tidak membutuhkan Node.js**.
+**Enterprise R3 Release Candidate (5.0.0-rc3)**. Source telah melewati seluruh gate lokal yang tersedia. Label Production Final hanya diberikan setelah workflow **NEXA Full UAT** pada GitHub hijau seluruhnya menggunakan MySQL 8.4 + browser E2E.
 
-Minimum yang disarankan:
-- PHP 8.1+ (PHP 8.2/8.3/8.4 direkomendasikan)
-- PDO MySQL (`pdo_mysql`)
-- MySQL 8.x atau MariaDB modern
-- HTTPS
-- Apache/Nginx dengan akses web hanya ke source publik aplikasi
+## Kemampuan utama
 
-`mbstring` bersifat opsional; aplikasi memiliki fallback untuk validasi string dasar.
+- Multi company, branch, department, cost center, profit center.
+- Chart of Accounts dan double-entry ledger.
+- Pendapatan Harian dinamis per jenis usaha dan split kas/bank.
+- Approval policy, journal batch, controlled reversal, period closing.
+- AR/AP, invoice detail, payment allocation, aging.
+- Cash/bank, CSV bank import, reconciliation session dan matching.
+- Budget/forecast dan variance.
+- Fixed asset + depreciation schedule/posting.
+- Pajak configurable dan tax transaction register.
+- Multi-currency, FX rate history dan realized gain/loss.
+- Intercompany matching, consolidation run dan elimination layer.
+- Integration staging/inbox/outbox + idempotency.
+- Settlement batch untuk OTA/payment channel.
+- RBAC, entity scope, CSRF, prepared statements, login throttling, audit trail.
+- Laba Rugi, Neraca, Arus Kas, Buku Besar, Neraca Saldo, Intercompany.
+- CSV/XLS/Print-PDF compatible export.
+- Dashboard modern, dark mode, grafik native tanpa CDN.
+- Backup/restore snapshot dengan checksum.
 
-## Jalankan lokal — Demo Mode
+## Arsitektur
+
+Business rules dipisah dari UI/legacy adapter di `src/`:
+
+- `Accounting/`, `Revenue/`, `ARAP/`, `Banking/`
+- `Consolidation/`, `Tax/`, `FX/`, `Assets/`, `Budget/`
+- `Reports/`, `Security/`, `Audit/`, `Integration/`
+- `Organization/`, `Infrastructure/Persistence/`, `Application/`
+
+Lihat `docs/ENTERPRISE-R3-ARCHITECTURE.md`.
+
+## Fresh install
+
+Persyaratan minimum yang disarankan:
+
+- PHP 8.2+
+- PDO MySQL
+- MySQL 8.0+/8.4
+- HTTPS untuk production
+
+Buat database dengan:
+
 ```bash
-php -S 127.0.0.1:8080
-```
-Buka `http://127.0.0.1:8080`.
-
-Demo Mode menggunakan `storage/demo-data.json` dan cocok untuk UAT UI/logic tanpa MySQL.
-
-## Fresh install MySQL
-### Server yang boleh membuat database
-```bash
-mysql -u USER -p < database/schema.sql
-mysql -u USER -p < database/seed.sql
+mysql -u USER -p < database/schema_enterprise.sql
+mysql -u USER -p nexa_group_finance < database/seed_enterprise.sql
 ```
 
-### Shared hosting/cPanel yang databasenya sudah dibuat
-1. Buat database dan user dari panel hosting.
-2. Import `database/schema_shared_hosting.sql` melalui phpMyAdmin.
-3. Import `database/seed_shared_hosting.sql`.
-4. Copy `config/config.local.example.php` menjadi `config/config.local.php`.
-5. Isi kredensial database, `setup_key`, dan `integration_key`.
-6. Pastikan `demo_mode => false`.
-7. Buka `setup.php` untuk membuat Group Owner pertama.
-8. Setelah user pertama dibuat, `setup.php` otomatis tidak dapat membuat owner kedua.
+`seed_enterprise.sql` hanya baseline/UAT. Untuk produksi resmi, ganti dengan badan usaha, COA, saldo awal, user dan master data riil.
 
-## Upgrade RC2 → Production Final R2
-Backup RC2 lebih dulu, timpa source, lalu jalankan:
-```sql
-SOURCE database/migrations/20260925_v4_production_final.sql;
-```
-Di phpMyAdmin, cukup import file migration tersebut.
+Konfigurasi dapat menggunakan environment variable atau `config/config.local.php`. Jangan commit password database atau integration key.
 
-## Security behavior penting
-- Mode produksi **fail-closed**. Jika PDO MySQL/koneksi DB gagal, aplikasi tidak diam-diam menampilkan data demo.
-- Debit wajib sama dengan kredit sebelum jurnal terposting.
-- Closed period memblokir mutation.
-- Approval override tidak dapat dikirim melalui request eksternal.
-- Entity Admin dibatasi ke company scope.
-- Nomor rekening dimasking di dashboard payload.
-- CSRF, prepared statements, secure session baseline, login throttling, password hashing, dan audit log aktif.
-- Direktori `config`, `database`, `storage`, `tests`, `docs`, `lib`, dan `.github` dilindungi `.htaccess` pada Apache.
+Set minimal:
 
-## Integration staging API
-Endpoint: `POST /integration.php`
-
-Header:
 ```text
-Content-Type: application/json
-X-Nexa-Key: <integration_key>
+NEXA_DEMO_MODE=false
+NEXA_DB_HOST=127.0.0.1
+NEXA_DB_PORT=3306
+NEXA_DB_NAME=nexa_group_finance
+NEXA_DB_USER=...
+NEXA_DB_PASS=...
+NEXA_SETUP_KEY=...
+NEXA_INTEGRATION_KEY=...
+NEXA_TIMEZONE=Asia/Makassar
 ```
 
-Contoh payload:
-```json
-{
-  "source": "HOTEL-PMS",
-  "company_id": 1,
-  "external_ref": "SETTLEMENT-20260925-001",
-  "amount": 48500000,
-  "payload": {
-    "note": "raw source payload dapat ikut disimpan untuk mapping"
-  }
-}
-```
+## Upgrade dari Production Final R2
 
-Endpoint hanya menulis ke **integration staging**, bukan langsung ke ledger. `(source, external_ref)` bersifat idempotent.
+Backup database lebih dahulu, lalu jalankan:
 
-## Test
-Demo/accounting regression:
 ```bash
-php tests/run.php
+mysql -u USER -p nexa_group_finance < database/migrations/20260925_v6_enterprise_r3.sql
 ```
 
-Fail-closed production check:
+Migration v6 mempertahankan data R2 dan menambah branch/department, journal batch, invoice lines, payment allocations, bank reconciliation session, depreciation schedule, tax transaction, FX rate, consolidation run, integration inbox/outbox, settlement, approval policy dan normalized uniqueness scopes.
+
+## Local regression di Ubuntu
+
 ```bash
-php tests/production-fail-closed.php
+cd ~/Desktop/program/'keuangan sentral'
+bash tests/run-all-local.sh
 ```
 
-MySQL production simulation disediakan di:
-```text
-.github/workflows/mysql-production.yml
-```
-Workflow tersebut menjalankan MySQL 8.4, import schema+seed, production function tests, login+CSRF HTTP test, journal mutation API, health endpoint, serta integration staging API.
+Gate MySQL produksi dan browser penuh dijalankan pada GitHub Actions karena membutuhkan service MySQL 8.4 dan Chromium/Playwright.
 
-## Deployment gate
-Lihat `PRODUCTION-CHECKLIST.md` dan `VALIDATION.md` sebelum digunakan sebagai pembukuan resmi.
+## Full UAT GitHub
 
-## Pendapatan Harian Dinamis (R2)
-Menu **Pendapatan Harian** memberikan form operasional per badan usaha. Kategori pendapatan dapat dikonfigurasi dan dipetakan ke akun revenue; penerimaan dapat dibagi ke kanal kas/bank. Sistem hanya memposting bila total pendapatan = total pembayaran, periode masih open, user berwenang, dan approval threshold terpenuhi.
+Workflow: `.github/workflows/full-uat.yml`
+
+Gate wajib:
+
+1. Core / Static Regression
+2. MySQL / Accounting UAT
+3. R2 → R3 Migration UAT
+4. HTTP / Security / Reports UAT
+5. Browser E2E / Visual UAT
+6. Multi-Entity / High-Volume UAT
+7. Production Candidate UAT Verdict
+
+Verdict hanya hijau jika semua dependency hijau. Screenshot browser dan server logs diunggah sebagai GitHub artifacts.
+
+## Aturan produksi penting
+
+- Jangan menjalankan production dengan `NEXA_DEMO_MODE=true`.
+- Jangan menghapus jurnal posted; gunakan reversal.
+- Jangan edit database dengan DDL ad-hoc; gunakan migration resmi.
+- Jangan buka approval/period/security gate hanya agar test hijau.
+- Jangan masukkan data keuangan resmi sebelum Full UAT GitHub hijau dan staging UAT selesai.

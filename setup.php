@@ -2,7 +2,7 @@
 require __DIR__.'/lib/bootstrap.php';
 if($config['demo_mode']){header('Location: index.php');exit;}
 $error='';$done=false;$pdo=null;try{$pdo=db();}catch(Throwable $e){$error='Database produksi belum siap. Periksa driver PDO MySQL, kredensial, dan schema.';}
-if(!$pdo&&!$error){$error='Database belum tersedia. Import database/schema.sql lalu periksa konfigurasi.';}
+if(!$pdo&&!$error){$error='Database belum tersedia. Import database/schema_enterprise.sql lalu periksa konfigurasi.';}
 $count=0;if($pdo){try{$count=(int)$pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();}catch(Throwable $e){$error='Schema belum lengkap: '.$e->getMessage();}}
 if($count>0){header('Location: login.php');exit;}
 if($_SERVER['REQUEST_METHOD']==='POST'&&!$error){try{verifyCsrf();$name=trim((string)($_POST['name']??''));$email=strtolower(trim((string)($_POST['email']??'')));$pass=(string)($_POST['password']??'');$key=(string)($_POST['setup_key']??'');if($config['setup_key']!==''&&!hash_equals($config['setup_key'],$key))throw new RuntimeException('Setup key tidak valid.');if(strlen($name)<3||!filter_var($email,FILTER_VALIDATE_EMAIL)||strlen($pass)<12)throw new RuntimeException('Nama/email tidak valid atau password kurang dari 12 karakter.');$st=$pdo->prepare("INSERT INTO users(name,email,password_hash,role,is_active) VALUES(?,?,?,'group_owner',1)");$st->execute([$name,$email,password_hash($pass,PASSWORD_DEFAULT)]);$done=true;}catch(Throwable $e){$error=$e->getMessage();}}

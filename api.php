@@ -10,6 +10,12 @@ try {
     if($_SERVER['REQUEST_METHOD']==='POST'&&$action==='create-company'){
         verifyCsrf();$row=createCompany($_POST);jsonOut(['ok'=>true,'message'=>'Badan usaha berhasil dibuat.','company'=>$row]);
     }
+    if($_SERVER['REQUEST_METHOD']==='POST'&&$action==='create-branch'){
+        verifyCsrf();$row=createBranch($_POST);jsonOut(['ok'=>true,'message'=>'Cabang berhasil disimpan.','branch'=>$row]);
+    }
+    if($_SERVER['REQUEST_METHOD']==='POST'&&$action==='create-department'){
+        verifyCsrf();$row=createDepartment($_POST);jsonOut(['ok'=>true,'message'=>'Departemen / cost center berhasil disimpan.','department'=>$row]);
+    }
     if($_SERVER['REQUEST_METHOD']==='POST'&&$action==='create-user'){
         verifyCsrf();$row=createUserAccount($_POST);jsonOut(['ok'=>true,'message'=>'User berhasil dibuat.','user'=>$row]);
     }

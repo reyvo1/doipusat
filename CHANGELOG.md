@@ -1,38 +1,33 @@
-# Changelog
+# CHANGELOG
 
-## Production Final R2 — 2026-09-25
-- Production DB fail-closed; tidak ada silent fallback ke Demo Mode.
-- Dashboard production trend dan KPI dihitung dari ledger nyata.
-- External approval override ditutup; bypass hanya dapat dipanggil internal approval flow.
-- Atomic production posting untuk approval dan AR/AP payment allocation.
-- Account/company ownership validation untuk posting jurnal.
-- Bank reconciliation memvalidasi company, amount, dan cash-flow direction.
-- COA lookup AR/AP berdasarkan account code, tidak bergantung ID hasil import.
-- Company/User/Budget/Asset/Bank Account CRUD backend + UI actions.
-- Financial report tabs diaktifkan: P&L, Balance Sheet, Cash Flow, Ledger, Trial Balance, Intercompany.
-- Group/entity report scope + scoped export.
-- Neraca memasukkan cumulative retained earnings/profit pada equity summary.
-- Account number masking dan user-directory scope hardening.
-- Optional `mbstring` fallback untuk shared-hosting portability.
-- Future asset depreciation regression diperbaiki.
-- Health endpoint `health.php`.
-- Integration staging endpoint `integration.php` dengan separate key, idempotency, 1 MB payload cap.
-- Login rate limiting + password rehash path.
-- `.htaccess` hardening untuk source sensitif.
-- Backup restore sekarang benar-benar memverifikasi SHA-256 dan size limit.
-- Shared-hosting schema/seed dan `config.local.php` pattern.
-- MySQL 8.4 GitHub Actions production simulation workflow.
-- Demo/accounting/security suite naik menjadi **55 checks**.
+## Enterprise R3 RC — 2026-09-25
 
-## RC2 — Finance Completion & Recovery Hardening — 2026-09-25
-- Controlled reversal, AR/AP allocation, elimination, tax, FX, bank import, backup, integration staging.
+### Architecture
+- Added PSR-4-style `Nexa\` autoloading and modular domain/application/infrastructure layers.
+- Added 80+ focused PHP modules for accounting, organization, AR/AP, banking, tax, FX, assets, budget, consolidation, reports, security, integration and audit.
+- Legacy UI/API remains compatible while selected rules delegate to typed enterprise services.
 
-## RC1 — Production Hardening
-- Authentication/RBAC, approvals, period close, AR/AP, bank reconciliation, multi-currency registry.
+### Organization
+- Added Branch and Department/Cost Center/Profit Center master data.
+- Added real CRUD APIs and modern UI page `Cabang & Departemen`.
 
-## Production Final R2 — Dynamic Daily Income
-- Added dynamic Pendapatan Harian UI per entity.
-- Added configurable income categories mapped to revenue accounts.
-- Added split cash/bank receipt input and multi-line double-entry posting.
-- Added approval/period/RBAC/entity-scope gates for daily income.
-- Added migration 20260925_v5_daily_income.sql and regression coverage.
+### Database
+- Added clean fresh `schema_enterprise.sql` and `seed_enterprise.sql`.
+- Added R2→R3 migration v6.
+- Added journal batches, invoice lines, payment allocations, reconciliation sessions/matches, bank statement imports, depreciation schedules, tax transactions, FX rates, approval policies, consolidation runs/eliminations, integration events/outbox and settlement batches.
+- Added normalized generated scope columns to enforce uniqueness when optional scope IDs are NULL.
+- Added structural parity fields for upgrade path.
+
+### Reliability/security fixes
+- Fixed undefined production `$demoUsers` path.
+- Removed duplicate/wrong `login_attempts` migration definition.
+- Added `last_login_at` update on successful authentication.
+- Preserved fail-closed production DB behavior.
+
+### QA
+- 62/62 legacy regression PASS.
+- 35/35 enterprise domain PASS.
+- 33/33 enterprise advanced PASS.
+- Added enterprise schema and relational DB UAT for GitHub MySQL 8.4.
+- Added R2→R3 migration preservation gate.
+- Expanded route/browser UAT to 21 pages including Organization.

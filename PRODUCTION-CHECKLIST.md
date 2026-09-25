@@ -1,61 +1,32 @@
-# Production Checklist — NEXA Group Finance
+# Production Checklist — NEXA Enterprise R3
 
-## 1. Runtime
-- [ ] PHP 8.1+ aktif.
-- [ ] `pdo_mysql` aktif.
-- [ ] HTTPS aktif dan redirect HTTP→HTTPS diterapkan di hosting/reverse proxy.
-- [ ] `config/config.local.php` tidak dapat diakses publik.
-- [ ] `storage/`, `database/`, `tests/`, `docs/`, `lib/`, `.github/` tidak dapat dibrowse publik.
+## Sebelum UAT GitHub
+- [x] Source modular enterprise
+- [x] Fresh enterprise schema terpisah
+- [x] R2→R3 migration terpisah
+- [x] Local deterministic regression hijau
+- [x] 21 route demo hijau
+- [x] Workflow MySQL/browser/scale tersedia
+- [x] Tidak ada secret/token di source scan
 
-## 2. Database
-- [ ] Fresh schema atau migration v4 berhasil tanpa error.
-- [ ] DB user memakai least privilege untuk database NEXA saja.
-- [ ] `health.php` mengembalikan `database: reachable`.
-- [ ] `tests/mysql-production.php` PASS pada staging MySQL target.
-- [ ] GitHub Actions `NEXA MySQL Production Simulation` hijau.
+## Wajib hijau di GitHub sebelum label Production Final
+- [ ] Core / Static Regression
+- [ ] MySQL / Accounting UAT
+- [ ] R2 → R3 Migration UAT
+- [ ] HTTP / Security / Reports UAT
+- [ ] Browser E2E / Visual UAT
+- [ ] Multi-Entity / High-Volume UAT
+- [ ] Production Candidate UAT Verdict
 
-## 3. Business master data
-- [ ] Semua badan usaha/cabang dimasukkan.
-- [ ] Chart of Accounts disepakati dengan akuntan/perusahaan.
-- [ ] Opening balances diimpor dan Trial Balance = 0 selisih debit/kredit.
-- [ ] Accounting equation direkonsiliasi.
-- [ ] Rekening bank dipetakan ke COA yang benar.
-- [ ] Approval threshold/matrix disepakati.
-- [ ] Fiscal calendar dan closing policy disepakati.
-
-## 4. Pajak & FX
-- [ ] Tax profile direview sesuai kewajiban masing-masing badan usaha.
-- [ ] Perlakuan pajak hotel/retail/kos/properti/F&B diverifikasi akuntan/pajak.
-- [ ] Rate source FX dan prosedur revaluation/settlement disepakati.
-
-## 5. Integration
-- [ ] `integration_key` berbeda dari `setup_key` dan password database.
-- [ ] Connector TAMASYA/Hotel mapping disetujui.
-- [ ] POS/retail mapping disetujui.
-- [ ] Kos/property mapping disetujui.
-- [ ] Idempotency `source + external_ref` diuji.
-- [ ] Failed payload tidak langsung menyentuh ledger.
-
-## 6. Security/UAT
-- [ ] Login Group Owner PASS.
-- [ ] Group Finance PASS.
-- [ ] Entity Admin hanya melihat company-nya.
-- [ ] Auditor read-only.
-- [ ] Viewer read-only.
-- [ ] Jurnal > threshold masuk approval.
-- [ ] Closed period menolak mutation.
-- [ ] Reversal tidak menghapus jurnal asli.
-- [ ] Backup file tampered ditolak.
-
-## 7. Disaster recovery
-- [ ] Backup MySQL otomatis hosting/VPS aktif.
-- [ ] Backup disimpan di lokasi berbeda dari server utama.
-- [ ] Restore drill MySQL berhasil pada database staging kosong.
-- [ ] RPO/RTO bisnis ditetapkan.
-
-## 8. Go-live
-- [ ] Demo Mode = false.
-- [ ] Demo data tidak tercampur ke produksi.
-- [ ] Opening balance signed-off.
-- [ ] Satu hari transaksi paralel direkonsiliasi dengan sistem lama/manual.
-- [ ] Owner/Finance menerima laporan group dan per-entitas yang sama dengan ledger.
+## Wajib sebelum data keuangan resmi
+- [ ] Backup database/staging
+- [ ] COA riil disetujui finance/accounting
+- [ ] Saldo awal direkonsiliasi
+- [ ] Daftar badan usaha/cabang/departemen riil
+- [ ] Rekening bank & payment channels riil
+- [ ] Tax profile riil
+- [ ] User/role riil
+- [ ] HTTPS aktif
+- [ ] `NEXA_DEMO_MODE=false`
+- [ ] DB credentials dan integration key tidak berada di repository
+- [ ] UAT transaksi harian, closing, reversal, AR/AP, bank reconciliation dan laporan ditandatangani owner/finance

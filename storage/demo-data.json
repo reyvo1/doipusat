@@ -29,6 +29,82 @@
             "color": "amber"
         }
     ],
+    "branches": [
+        {
+            "id": 1,
+            "company_id": 1,
+            "code": "HTL-MDO",
+            "name": "Hotel Manado",
+            "timezone": "Asia\/Makassar",
+            "active": 1
+        },
+        {
+            "id": 2,
+            "company_id": 2,
+            "code": "RTL-MDO",
+            "name": "Retail Manado",
+            "timezone": "Asia\/Makassar",
+            "active": 1
+        },
+        {
+            "id": 3,
+            "company_id": 3,
+            "code": "KOS-A",
+            "name": "Kos Harmoni A",
+            "timezone": "Asia\/Makassar",
+            "active": 1
+        },
+        {
+            "id": 4,
+            "company_id": 4,
+            "code": "FNB-MDO",
+            "name": "Kuliner Manado",
+            "timezone": "Asia\/Makassar",
+            "active": 1
+        }
+    ],
+    "departments": [
+        {
+            "id": 1,
+            "company_id": 1,
+            "branch_id": 1,
+            "code": "ROOM",
+            "name": "Rooms",
+            "cost_center_code": "CC-ROOM",
+            "profit_center_code": "PC-ROOM",
+            "active": 1
+        },
+        {
+            "id": 2,
+            "company_id": 1,
+            "branch_id": 1,
+            "code": "FNB",
+            "name": "Food & Beverage",
+            "cost_center_code": "CC-FNB",
+            "profit_center_code": "PC-FNB",
+            "active": 1
+        },
+        {
+            "id": 3,
+            "company_id": 2,
+            "branch_id": 2,
+            "code": "SALES",
+            "name": "Sales",
+            "cost_center_code": "CC-SALES",
+            "profit_center_code": "PC-SALES",
+            "active": 1
+        },
+        {
+            "id": 4,
+            "company_id": 3,
+            "branch_id": 3,
+            "code": "RENT",
+            "name": "Rental",
+            "cost_center_code": "CC-RENT",
+            "profit_center_code": "PC-RENT",
+            "active": 1
+        }
+    ],
     "accounts": [
         {
             "id": 1,

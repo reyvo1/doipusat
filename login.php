@@ -12,7 +12,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     if(!loginRateAllowed($pdo,$email,$ip)){usleep(350000);throw new RuntimeException('Terlalu banyak percobaan login. Coba kembali beberapa menit lagi.');}
     $st=$pdo->prepare('SELECT id,name,email,password_hash,role,company_id,is_active FROM users WHERE email=? LIMIT 1');$st->execute([$email]);$u=$st->fetch();
     if(!$u||!$u['is_active']||!password_verify($pass,$u['password_hash'])){recordLoginAttempt($pdo,$email,$ip,false);usleep(250000);throw new RuntimeException('Email atau password salah.');}
-    recordLoginAttempt($pdo,$email,$ip,true);if(password_needs_rehash($u['password_hash'],PASSWORD_DEFAULT)){$pdo->prepare('UPDATE users SET password_hash=? WHERE id=?')->execute([password_hash($pass,PASSWORD_DEFAULT),$u['id']]);}
+    recordLoginAttempt($pdo,$email,$ip,true);$pdo->prepare('UPDATE users SET last_login_at=NOW() WHERE id=?')->execute([$u['id']]);if(password_needs_rehash($u['password_hash'],PASSWORD_DEFAULT)){$pdo->prepare('UPDATE users SET password_hash=? WHERE id=?')->execute([password_hash($pass,PASSWORD_DEFAULT),$u['id']]);}
     session_regenerate_id(true);$_SESSION['user_id']=(int)$u['id'];$_SESSION['user_name']=$u['name'];writeAudit('auth.login',['id'=>(int)$u['id']]);header('Location: index.php');exit;
   }catch(Throwable $e){$error=$e->getMessage();}
 }

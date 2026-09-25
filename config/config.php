@@ -1,7 +1,7 @@
 <?php
 $base = [
     'app_name' => getenv('NEXA_APP_NAME') ?: 'NEXA Group Finance',
-    'version' => '4.0.0',
+    'version' => '5.0.0-rc3',
     'environment' => getenv('NEXA_ENV') ?: 'production',
     'timezone' => getenv('NEXA_TIMEZONE') ?: 'Asia/Makassar',
     'base_currency' => getenv('NEXA_CURRENCY') ?: 'IDR',
